@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {PropTypes} from 'prop-types';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -8,8 +7,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 class RecordTable extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.people = [
             {
                 name: "Veronica Mize",
@@ -39,7 +38,38 @@ class RecordTable extends Component {
         ];
     }
 
+    comparePeople(filterType, a, b) {
+        if(filterType === 'name') {
+            // Sort By Name
+            const nameA = a.name.toUpperCase();
+            const nameB = b.name.toUpperCase();
+            if(nameA < nameB) return -1;
+            if(nameA > nameB) return 1;
+            return 0
+        }
+        else if(filterType === 'age') {
+            // Sort By Age
+            const aComps = a.dob.split("/");
+            const bComps = b.dob.split("/");
+            const aDate = new Date(aComps[2], aComps[1], aComps[0]);
+            const bDate = new Date(bComps[2], bComps[1], bComps[0]);
+            return aDate.getTime() - bDate.getTime();
+        }
+    }
+
     render() {
+        const people = this.people.slice();
+        people.sort((a, b) => {
+            return this.comparePeople(this.props.filterType, a, b);
+        });
+        const rows = people.map((person) =>
+            (
+                <TableRow key={person.name}>
+                    <TableCell>{person.name}</TableCell>
+                    <TableCell>{person.dob}</TableCell>
+                </TableRow>
+            )
+        )
         return (
             <Paper className="width">
                 <Table>
@@ -50,10 +80,7 @@ class RecordTable extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                                <TableRow>
-                                    <TableCell>Insert Name</TableCell>
-                                    <TableCell>Insert DOB</TableCell>
-                                </TableRow>
+                        {rows}
                     </TableBody>
                 </Table>
             </Paper>
